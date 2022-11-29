@@ -60,7 +60,7 @@ while True:
         servo = (160*PIDsumbux)/frame.shape[1]
         servo = int(0+servo)
     servo = servo - 80
-    arduino.write(bytes(str(80), 'utf-8'))
+    arduino.write(bytes(str(servo), 'utf-8'))
     print(servo, ' | ', PIDsumbux, )
 
     cv2.line(frame, visualtitikpeyimpanganPID1, visualtitikpeyimpanganPID2, (0,255,0), thickness=3 )
