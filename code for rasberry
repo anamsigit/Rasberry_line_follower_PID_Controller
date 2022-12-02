@@ -2,13 +2,12 @@ import cv2
 import numpy as np
 import serial
 from simple_pid import PID
-arduino = serial.Serial(port='COM14', baudrate=115200, timeout=.1)  #double check about port and baudrate, match yuor device
+arduino = serial.Serial(port='COM14', baudrate=115200, timeout=.1) 
 
-#initiate of PID only
-PIDpoint = [90, 90] 
-cx = 0 
+PIDpoint = [90, 90]
+senddelay = []
 
-whitecolor = 255,255,255
+cx = 0
 
 cap = cv2.VideoCapture(0)
 while True:
@@ -24,33 +23,45 @@ while True:
         if M["m00"] !=0 :
             cx = int(M['m10']/M['m00'])
             cy = int(M['m01']/M['m00'])
-            cv2.circle(frame, (cx,cy), 5, (whitecolor), -1)
+            # print("CX : "+str(cx)+"  CY : "+str(cy))
+            # panjang frame 240
+            # if cx >= 120 :
+            #     print("Turn Left")
+            # if cx < 120 and cx > 40 :
+            #     print("On Track!")
+            # if cx <=40 :
+            #     print("Turn Right")
+            cv2.circle(frame, (cx,cy), 5, (255,255,255), -1)
     else :
         # print("I don't see the line")
         cx = int(frame.shape[1]/2)
     
-    #PID controller code
     setpointx = cx
 
     def pidcontrolx(errorx):
-        pidx = PID(0.5, 0.2, 0.01, setpointx, sample_time=0.01, output_limits=(-25, 25))
+        pidx = PID(0.5, 0.2, 0.01, setpointx, sample_time=0.01, output_limits=(-25, 25)) #satu fungsi hanya berlaku untuk 1 error, tidak bisa multi
         koreksix = pidx(errorx)
         if errorx == setpointx:
             evaluasi = errorx + koreksix #disinlah letak pengurangan error oleh koreksi
         else:
             evaluasi = errorx + koreksix
         return evaluasi
+        
     PIDpointupdate = pidcontrolx(PIDpoint[len(PIDpoint)-1])
     PIDpoint.append(PIDpointupdate)
     PIDsumbux = PIDpoint[len(PIDpoint)-1]
-    
-    #visuall only
+    # if cx == int(frame.shape[1]/2):
+    #     print(int(PIDsumbux), 'lurus')
+    # elif cx < int(frame.shape[1]/2): 
+    #     print(int(PIDsumbux), 'kiri')
+    # elif cx > int(frame.shape[1]/2): 
+    #     print(int(PIDsumbux), 'kanan')
+
     visualtitikpeyimpanganPID1 = (int(frame.shape[1]/2), int(100))
     visualtitikpeyimpanganPID2 = (int(PIDsumbux), int(100))
     visualtitikpeyimpangan1 = (int(int(frame.shape[1]/2)), int(100))
     visualtitikpeyimpangan2 = (int(cx), int(100))
 
-    #mapping value lengh of frame to 80 and -80
     if PIDsumbux >= frame.shape[1]:
         PIDsumbux = PIDsumbux - frame.shape[1]
         servo = (160*PIDsumbux)/frame.shape[1]
@@ -60,8 +71,11 @@ while True:
         servo = (160*PIDsumbux)/frame.shape[1]
         servo = int(0+servo)
     servo = servo - 80
-    arduino.write(bytes(str(servo), 'utf-8'))
-    print(servo, ' | ', PIDsumbux, )
+    senddelay.append(1)
+    if senddelay > 18: #angka 20 menentukan delay kirim
+        arduino.write(bytes(servo, 'utf-8'))
+        print(servo, ' | ', PIDsumbux, )
+        senddelay.clear()
 
     cv2.line(frame, visualtitikpeyimpanganPID1, visualtitikpeyimpanganPID2, (0,255,0), thickness=3 )
     cv2.line(frame, visualtitikpeyimpangan1, visualtitikpeyimpangan2, (0,255,255), thickness=1 )
@@ -73,3 +87,4 @@ while True:
         break
 cap.release()
 cv2.destroyAllWindows()
+
