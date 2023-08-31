@@ -23,3 +23,5 @@ Attention :
 before you can run esp32 code, you need to install the library provided by robojax here : http://robojax.com/learn/arduino/robojax_ESP-L298N-DC-Motor_library.zip. I thank and appreciate robojax for the code
 
 calibration PID, you can visit this amazing website: https://www.rentanadviser.com/pid-fuzzy-logic/pid-fuzzy-logic.aspx
+
+video demo : https://youtu.be/Nl7agIYDsWA
