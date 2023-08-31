@@ -6,6 +6,11 @@ rasberry receives a frame from the camera, then with the python program the fram
 
 The resulting center point is recorded for its x coordinate, then processed by the PID to provide a more optimal movement. the PID value is then mapped so that it can provide a value ranging from 80 to -80 (meaning when the value is 0, the robot goes straight). the mapping results are then sent to the esp32 microcontroller and entered in a variable to set the speed of the two tires
 
+The green line indicates PID output then the yellow line indicates camera detection of the black line location actually. As a result, PID Controler prevents robot from making unnecessary turns due to black line detection errors.
+
+<img width="350" height="350" src="https://github.com/anamsigit/Rasberry_line_follower_PID_Controller/blob/main/black-straigh-line.jpeg">
+<img width="350" height="350" src="https://github.com/anamsigit/Rasberry_line_follower_PID_Controller/blob/main/detect-on_black-straigh-line.png">
+
 # how it work : rasberry
 the cx variable plays an important role in controlling the movement of the robot's turns
 
